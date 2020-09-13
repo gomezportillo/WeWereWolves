@@ -30,6 +30,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
+        //PhotonNetwork.ConnectToRegion("eu");
 
         menuProxyScript = menuProxyObject.GetComponent<NetManagerProxyForMenu>();
     }
@@ -84,6 +85,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         base.OnJoinedRoom();
 
         Debug.Log("Joined room: " + PhotonNetwork.CurrentRoom.Name);
+        Debug.Log("Cloud region: " + PhotonNetwork.CloudRegion);
 
         ChangeScene("Game");
     }

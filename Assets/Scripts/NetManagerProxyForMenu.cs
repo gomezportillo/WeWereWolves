@@ -10,18 +10,22 @@ public class NetManagerProxyForMenu : MonoBehaviour
     [SerializeField]
     public GameObject villajeCodeInput;
 
+    [SerializeField]
+    public TMPro.TextMeshProUGUI errorText;
+
     void Start()
     {
+        errorText.text = string.Empty;
     }
 
     public void ErrorJoiningRoom(string message)
     {
-        // escribirlo en la gui
+        errorText.text = message;
     }
 
     public void ErrorCreatingRoom(string message)
     {
-        // escribirlo en la gui
+        errorText.text = message;
     }
 
     public void CreateRoom()
@@ -55,8 +59,7 @@ public class NetManagerProxyForMenu : MonoBehaviour
 
         if (code == null || code == string.Empty)
         {
-            // escribilo en la gui
-            Debug.Log("The village code cannot be empy");
+            errorText.text = "Village code cannot be empty";
         }
         else
         {
