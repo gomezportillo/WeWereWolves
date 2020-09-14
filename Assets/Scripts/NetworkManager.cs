@@ -10,8 +10,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private const string GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     [SerializeField]
-    public GameObject menuProxyObject;
-    private NetManagerProxyForMenu menuProxyScript;
+    public GameObject guiProxyObject;
+    private GUIProxyNetworkManager guiProxyScript;
 
     public static NetworkManager instance;
     
@@ -29,16 +29,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        PhotonNetwork.ConnectUsingSettings();
-        //PhotonNetwork.ConnectToRegion("eu");
+        guiProxyScript = guiProxyObject.GetComponent<GUIProxyNetworkManager>();
 
-        menuProxyScript = menuProxyObject.GetComponent<NetManagerProxyForMenu>();
+        PhotonNetwork.ConnectUsingSettings();
     }
 
     public override void OnConnectedToMaster()
     {
         base.OnConnectedToMaster();
         Debug.Log("Connected to master server");
+
+        guiProxyScript.UpdateRegionGUI(PhotonNetwork.CloudRegion);
     }
 
     public string CreateRoom(string roomName)
@@ -69,8 +70,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         Debug.Log("Error creating room: " + message);
 
-        menuProxyScript.ErrorCreatingRoom(message);
-
+        guiProxyScript.ErrorCreatingRoom(message);
     }
 
     public void JoinRoom(string roomName)
@@ -85,8 +85,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         base.OnJoinedRoom();
 
         Debug.Log("Joined room: " + PhotonNetwork.CurrentRoom.Name);
-        Debug.Log("Cloud region: " + PhotonNetwork.CloudRegion);
 
+        guiProxyScript.JoinedRoom(PhotonNetwork.CurrentRoom.Name);
         ChangeScene("Game");
     }
 
@@ -96,13 +96,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         Debug.Log("Error joining room: " + message);
 
-        menuProxyScript.ErrorJoiningRoom(message);
+        guiProxyScript.ErrorJoiningRoom("This village does not exist");
     }
 
     public void ChangeScene(string sceneName)
     {
-        PhotonNetwork.LoadLevel(sceneName);
-
         Debug.Log("Changing scene to: " + sceneName);
+
+        PhotonNetwork.LoadLevel(sceneName);
     }
 }
