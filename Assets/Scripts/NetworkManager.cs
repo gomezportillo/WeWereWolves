@@ -52,7 +52,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
         }
 
-        PhotonNetwork.CreateRoom(roomName);
+        Photon.Realtime.RoomOptions roomOptions = new Photon.Realtime.RoomOptions
+        {
+            IsVisible = false,
+            MaxPlayers = 20 // TODO
+        };
+
+        PhotonNetwork.CreateRoom(roomName, roomOptions);
 
         return roomName;
     }

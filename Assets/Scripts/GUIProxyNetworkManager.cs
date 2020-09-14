@@ -42,6 +42,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
 
     public void CreateRoom()
     {
+        GlobalVariables.isOwner = true;
         string code = networkManager.GetComponent<NetworkManager>().CreateRoom(null);
     }
 
@@ -60,6 +61,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
         }
         else
         {
+            GlobalVariables.isOwner = false;
             networkManager.GetComponent<NetworkManager>().JoinRoom(code);
         }
     }
