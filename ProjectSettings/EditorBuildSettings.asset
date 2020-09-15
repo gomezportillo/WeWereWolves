@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 8ab4406f56edd924c91f1a1e27e7dfd6
   - enabled: 1
-    path: Assets/Scenes/Game.unity
+    path: Assets/Scenes/WaitingRoom.unity
     guid: f14296e676c68c24e86e44385d0f3219
+  - enabled: 1
+    path: Assets/Scenes/Village.unity
+    guid: 4fed33f7c650fc64da8f334af8c900da
   m_configObjects: {}

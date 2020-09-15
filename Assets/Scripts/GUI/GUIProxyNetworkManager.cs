@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 using WebSocketSharp;
 
 public class GUIProxyNetworkManager : MonoBehaviour
@@ -22,6 +23,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
     void Start()
     {
         errorText.text = string.Empty;
+        playerNameInput.text = GlobalVariables.GetPlayerName();
     }
 
     public void ErrorJoiningRoom(string message)
@@ -32,7 +34,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
     public void JoinedRoom(string roomCode)
     {
         GlobalVariables.roomCode = roomCode;
-        GlobalVariables.playerName = playerNameInput.text;
+        GlobalVariables.SetPlayerName(playerNameInput.text);
     }
 
     public void ErrorCreatingRoom(string message)
@@ -42,8 +44,8 @@ public class GUIProxyNetworkManager : MonoBehaviour
 
     public void CreateRoom()
     {
-        GlobalVariables.isOwner = true;
         string code = networkManager.GetComponent<NetworkManager>().CreateRoom(null);
+        GlobalVariables.isMasterClient = PhotonNetwork.IsMasterClient; // should be true
     }
 
     public void UpdateRegionGUI(string regionCode)
@@ -53,7 +55,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
 
     public void ReadInputAndJoinRoom()
     {
-        string code = villajeCodeInput.text;
+        string code = villajeCodeInput.text.ToUpper();
 
         if (string.IsNullOrEmpty(code))
         {
@@ -61,8 +63,8 @@ public class GUIProxyNetworkManager : MonoBehaviour
         }
         else
         {
-            GlobalVariables.isOwner = false;
             networkManager.GetComponent<NetworkManager>().JoinRoom(code);
+            GlobalVariables.isMasterClient = PhotonNetwork.IsMasterClient; // should be false
         }
     }
 

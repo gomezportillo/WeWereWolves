@@ -14,7 +14,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private GUIProxyNetworkManager guiProxyScript;
 
     public static NetworkManager instance;
-    
+
     void Awake()
     {
         if (instance != null && instance != this) {
@@ -55,11 +55,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Photon.Realtime.RoomOptions roomOptions = new Photon.Realtime.RoomOptions
         {
             IsVisible = false,
-            MaxPlayers = 20 // TODO
+            MaxPlayers = GlobalVariables.maxNumberPlayers,
         };
 
         PhotonNetwork.CreateRoom(roomName, roomOptions);
-
+        
         return roomName;
     }
 
@@ -93,7 +93,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("Joined room: " + PhotonNetwork.CurrentRoom.Name);
 
         guiProxyScript.JoinedRoom(PhotonNetwork.CurrentRoom.Name);
-        ChangeScene("Game");
+
+        PhotonNetwork.NickName = GlobalVariables.GetPlayerName();
+
+        ChangeScene(GlobalVariables.WAITING_ROOM_SCENE);
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
@@ -110,5 +113,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("Changing scene to: " + sceneName);
 
         PhotonNetwork.LoadLevel(sceneName);
+    }
+
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player other)
+    {
+        Debug.LogFormat("New player: " + other.NickName);
+    }
+
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player other)
+    {
+        Debug.LogFormat("Player left: " + other.NickName);
+    }
+
+    public override void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient)
+    {
+        Debug.LogFormat("Old master cliente left. New one is: " + newMasterClient.NickName);
     }
 }

@@ -7,6 +7,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     public int speed = 100;
 
+    [SerializeField]
+    public int nameFontSize = 4;
+
+    [SerializeField]
+    public Canvas canvas;
+
     private TMPro.TextMeshProUGUI playerNameText;
 
     private Animator animator;
@@ -15,12 +21,11 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        // create name
-        CreateNameTag();
-
         animator = gameObject.GetComponent<Animator>();
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
+
+        CreateNameText();
     }
 
     void Update()
@@ -28,7 +33,8 @@ public class PlayerController : MonoBehaviour
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
 
-        if ( inputX != 0 || inputY != 0) {
+        if (inputX != 0 || inputY != 0)
+        {
             Vector2 movement = new Vector2(speed * inputX, speed * inputY);
 
             movement *= Time.deltaTime;
@@ -50,15 +56,34 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetBool("isRunning", false);
         }
-
-
+        
+        UpdateNameTextPosition();
     }
-    void CreateNameTag()
+
+    void CreateNameText()
     {
-        playerNameText = new TMPro.TextMeshProUGUI();
-        playerNameText = gameObject.AddComponent<TMPro.TextMeshProUGUI>();
-        playerNameText.text = "RandomPeasant";
+        string playerName = GlobalVariables.GetPlayerName();
+
+        GameObject nameTextGO = new GameObject("text_" + playerName);
+        playerNameText = nameTextGO.AddComponent<TMPro.TextMeshProUGUI>();
+
+        //playerNameText = new TMPro.TextMeshProUGUI();
+        playerNameText.transform.SetParent(canvas.transform);
+
+        playerNameText.text = GlobalVariables.GetPlayerName();
         playerNameText.font = Resources.Load("gothic_pixel SDF", typeof(TMPro.TMP_FontAsset)) as TMPro.TMP_FontAsset;
-        playerNameText.fontSize = 3;
+        playerNameText.rectTransform.localScale = new Vector3(1, 1, 1);
+        playerNameText.alignment = TMPro.TextAlignmentOptions.Midline;
+        playerNameText.rectTransform.localScale = new Vector2(0.1f, 0.1f);
+
+        playerNameText.fontSize = nameFontSize;
+
+        UpdateNameTextPosition();
+    }
+
+    void UpdateNameTextPosition()
+    {
+        float Ydelta = .9f;
+        playerNameText.rectTransform.position = gameObject.transform.position + new Vector3(0, Ydelta, 0);
     }
 }
