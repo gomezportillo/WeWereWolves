@@ -129,4 +129,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Debug.LogFormat("Old master cliente left. New one is: " + newMasterClient.NickName);
     }
+
+    public string GetCurrentRoom()
+    {
+        return PhotonNetwork.CurrentRoom.Name;
+    }
 }

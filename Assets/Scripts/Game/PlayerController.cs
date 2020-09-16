@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -26,6 +27,8 @@ public class PlayerController : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
 
         CreateNameText();
+
+        Debug.Log("Nombre de la room " + NetworkManager.instance.GetCurrentRoom());
     }
 
     void Update()

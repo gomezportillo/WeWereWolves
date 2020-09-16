@@ -44,8 +44,8 @@ public class GUIProxyNetworkManager : MonoBehaviour
 
     public void CreateRoom()
     {
-        string code = networkManager.GetComponent<NetworkManager>().CreateRoom(null);
-        GlobalVariables.isMasterClient = PhotonNetwork.IsMasterClient; // should be true
+        //string code = networkManager.GetComponent<NetworkManager>().CreateRoom(null);
+        NetworkManager.instance.CreateRoom(null);
     }
 
     public void UpdateRegionGUI(string regionCode)
@@ -63,8 +63,8 @@ public class GUIProxyNetworkManager : MonoBehaviour
         }
         else
         {
-            networkManager.GetComponent<NetworkManager>().JoinRoom(code);
-            GlobalVariables.isMasterClient = PhotonNetwork.IsMasterClient; // should be false
+            //networkManager.GetComponent<NetworkManager>().JoinRoom(code);
+            NetworkManager.instance.JoinRoom(code);
         }
     }
 
