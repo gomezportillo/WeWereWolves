@@ -24,28 +24,36 @@ public class GUIProxyNetworkManager : MonoBehaviour
     {
         errorText.text = string.Empty;
         playerNameInput.text = GlobalVariables.GetPlayerName();
-    }
 
-    public void ErrorJoiningRoom(string message)
-    {
-        errorText.text = message;
+        NetworkEventManager.instance.ConnectedToMaster += UpdateRegionGUI;
+        NetworkEventManager.instance.JoinedRoom += JoinedRoom;
+        NetworkEventManager.instance.JoinRoomFailed += ErrorJoiningRoom;
+        NetworkEventManager.instance.CreateRoomFailed += ErrorCreatingRoom;
+
     }
 
     public void JoinedRoom(string roomCode)
     {
         GlobalVariables.roomCode = roomCode;
-        GlobalVariables.SetPlayerName(playerNameInput.text);
+
+        string playerName = playerNameInput.text; // comprobar isNullOrEmpty
+        GlobalVariables.SetPlayerName(playerName);
+        NetworkManager.instance.SetPlayerNickname(playerName);
     }
 
-    public void ErrorCreatingRoom(string message)
+    public void ErrorJoiningRoom(short returnCode, string message)
     {
-        errorText.text = message;
+        errorText.text = "This village does not exist";
     }
 
     public void CreateRoom()
     {
-        //string code = networkManager.GetComponent<NetworkManager>().CreateRoom(null);
         NetworkManager.instance.CreateRoom(null);
+    }
+
+    public void ErrorCreatingRoom(short returnCode, string message)
+    {
+        errorText.text = message;
     }
 
     public void UpdateRegionGUI(string regionCode)
@@ -63,8 +71,19 @@ public class GUIProxyNetworkManager : MonoBehaviour
         }
         else
         {
-            //networkManager.GetComponent<NetworkManager>().JoinRoom(code);
             NetworkManager.instance.JoinRoom(code);
+        }
+    }
+
+    public void SetPlayerNickname(string nickname)
+    {
+        if (string.IsNullOrEmpty(nickname))
+        {
+            // mostrar error
+        }
+        else
+        {
+            NetworkManager.instance.SetPlayerNickname(nickname);
         }
     }
 

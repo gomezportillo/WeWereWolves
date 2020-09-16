@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using WebSocketSharp;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -37,9 +39,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         base.OnConnectedToMaster();
-        Debug.Log("Connected to master server");
 
-        guiProxyScript.UpdateRegionGUI(PhotonNetwork.CloudRegion);
+        string regionCode = PhotonNetwork.CloudRegion;
+        NetworkEventManager.instance.OnConnectedToMaster(regionCode);
     }
 
     public string CreateRoom(string roomName)
@@ -67,21 +69,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         base.OnCreatedRoom();
 
-        Debug.Log("Created room: " + PhotonNetwork.CurrentRoom.Name);
+        string roomName = PhotonNetwork.CurrentRoom.Name;
+        NetworkEventManager.instance.OnCreatedRoom(roomName);
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         base.OnCreateRoomFailed(returnCode, message);
-
-        Debug.Log("Error creating room: " + message);
-
-        guiProxyScript.ErrorCreatingRoom(message);
+        NetworkEventManager.instance.OnCreateRoomFailed(returnCode, message);
     }
 
     public void JoinRoom(string roomName)
     {
-        Debug.Log("Joining room " + roomName + "...");
+        Logger.instance.LogInfo("Joining room " + roomName + "...");
 
         PhotonNetwork.JoinRoom(roomName);
     }
@@ -90,11 +90,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         base.OnJoinedRoom();
 
-        Debug.Log("Joined room: " + PhotonNetwork.CurrentRoom.Name);
-
-        guiProxyScript.JoinedRoom(PhotonNetwork.CurrentRoom.Name);
-
-        PhotonNetwork.NickName = GlobalVariables.GetPlayerName();
+        string roomName = PhotonNetwork.CurrentRoom.Name;
+        NetworkEventManager.instance.OnJoinedRoom(roomName);
 
         ChangeScene(GlobalVariables.WAITING_ROOM_SCENE);
     }
@@ -102,36 +99,42 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         base.OnJoinRoomFailed(returnCode, message);
-
-        Debug.Log("Error joining room: " + message);
-
-        guiProxyScript.ErrorJoiningRoom("This village does not exist");
-    }
-
-    public void ChangeScene(string sceneName)
-    {
-        Debug.Log("Changing scene to: " + sceneName);
-
-        PhotonNetwork.LoadLevel(sceneName);
+        NetworkEventManager.instance.OnJoinRoomFailed(returnCode, message);
     }
 
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player other)
     {
-        Debug.LogFormat("New player: " + other.NickName);
+        base.OnPlayerEnteredRoom(other);
+        NetworkEventManager.instance.OnPlayerEnteredRoom(other);
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player other)
     {
-        Debug.LogFormat("Player left: " + other.NickName);
+        base.OnPlayerLeftRoom(other);
+        NetworkEventManager.instance.OnPlayerLeftRoom(other);
     }
 
     public override void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient)
     {
-        Debug.LogFormat("Old master cliente left. New one is: " + newMasterClient.NickName);
+        base.OnMasterClientSwitched(newMasterClient);
+        NetworkEventManager.instance.OnMasterClientSwitched(newMasterClient);
+    }
+
+    // Non-events
+    public void ChangeScene(string sceneName)
+    {
+        Logger.instance.LogInfo("Changing scene to: " + sceneName);
+        PhotonNetwork.LoadLevel(sceneName);
     }
 
     public string GetCurrentRoom()
     {
         return PhotonNetwork.CurrentRoom.Name;
+    }
+
+    public void SetPlayerNickname(string nickname)
+    {
+        Logger.instance.LogInfo("New name: " + nickname);
+        PhotonNetwork.NickName = nickname;
     }
 }
