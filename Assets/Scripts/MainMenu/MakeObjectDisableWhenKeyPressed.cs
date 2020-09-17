@@ -8,7 +8,7 @@ public class MakeObjectDisableWhenKeyPressed : MonoBehaviour
     [SerializeField]
     public string key = "space";
     public GameObject objectToDisable;
-    public GameObject objectToEnable;
+    public List<GameObject> objectsToEnable;
 
     void Start()
     {
@@ -30,9 +30,9 @@ public class MakeObjectDisableWhenKeyPressed : MonoBehaviour
             objectToDisable.SetActive(initial);
         }
 
-        if (objectToEnable != null)
+        foreach (GameObject go in objectsToEnable)
         {
-            objectToEnable.SetActive(!initial);
+            go.SetActive(!initial);
         }
     }
 }

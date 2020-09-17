@@ -516,7 +516,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomRoomNameLenght: 4
-  guiProxyObject: {fileID: 235763747}
 --- !u!1 &212284513
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,7 +531,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &212284514
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2748,7 +2747,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1141404582
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3027,7 +3026,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   key: space
   objectToDisable: {fileID: 1141404581}
-  objectToEnable: {fileID: 1609350716}
+  objectsToEnable:
+  - {fileID: 212284513}
+  - {fileID: 1609350716}
 --- !u!1 &1222228092
 GameObject:
   m_ObjectHideFlags: 0
@@ -3060,8 +3061,8 @@ RectTransform:
   m_Father: {fileID: 1949049161}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5204,7 +5205,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1704509062
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5923,7 +5924,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

@@ -11,10 +11,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public int randomRoomNameLenght = 4;
     private const string GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    [SerializeField]
-    public GameObject guiProxyObject;
-    private GUIProxyNetworkManager guiProxyScript;
-
     public static NetworkManager instance;
 
     void Awake()
@@ -31,8 +27,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        guiProxyScript = guiProxyObject.GetComponent<GUIProxyNetworkManager>();
-
         PhotonNetwork.ConnectUsingSettings();
     }
 
@@ -54,7 +48,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
         }
 
-        Photon.Realtime.RoomOptions roomOptions = new Photon.Realtime.RoomOptions
+        RoomOptions roomOptions = new RoomOptions
         {
             IsVisible = false,
             MaxPlayers = GlobalVariables.maxNumberPlayers,
@@ -81,8 +75,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void JoinRoom(string roomName)
     {
-        Logger.instance.LogInfo("Joining room " + roomName + "...");
-
         PhotonNetwork.JoinRoom(roomName);
     }
 
@@ -102,19 +94,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         NetworkEventManager.instance.OnJoinRoomFailed(returnCode, message);
     }
 
-    public override void OnPlayerEnteredRoom(Photon.Realtime.Player other)
+    public override void OnPlayerEnteredRoom(Player other)
     {
         base.OnPlayerEnteredRoom(other);
         NetworkEventManager.instance.OnPlayerEnteredRoom(other);
     }
 
-    public override void OnPlayerLeftRoom(Photon.Realtime.Player other)
+    public override void OnPlayerLeftRoom(Player other)
     {
         base.OnPlayerLeftRoom(other);
         NetworkEventManager.instance.OnPlayerLeftRoom(other);
     }
 
-    public override void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient)
+    public override void OnMasterClientSwitched(Player newMasterClient)
     {
         base.OnMasterClientSwitched(newMasterClient);
         NetworkEventManager.instance.OnMasterClientSwitched(newMasterClient);

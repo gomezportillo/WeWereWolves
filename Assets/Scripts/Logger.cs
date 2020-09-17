@@ -27,6 +27,11 @@ public class Logger : MonoBehaviour
         NetworkEventManager.instance.MasterClientSwitched += this.MasterClientSwitched;
     }
 
+    void OnDestroy()
+    {
+        // Copy 
+    }
+
     void ConnectedToMaster(string region)
     {
         LogInfo("Connected to master on region: " + region);
@@ -79,10 +84,10 @@ public class Logger : MonoBehaviour
 
     private string MessageHeader()
     {
-        const int depth = 2;
+        const int DEPTH = 2;
         StackTrace stackTrace = new StackTrace();
-        string callingMethod = stackTrace.GetFrame(depth).GetMethod().Name;
-        //string callingClass = stackTrace.GetFrame(depth).GetType().Name;
+        string callingMethod = stackTrace.GetFrame(DEPTH).GetMethod().Name;
+        //string callingClass = stackTrace.GetFrame(DEPTH).GetType().Name;
 
         return "[" + callingMethod + "] ";
     }

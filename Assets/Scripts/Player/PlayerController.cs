@@ -14,11 +14,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     public Canvas canvas;
 
-    private TMPro.TextMeshProUGUI playerNameText;
-
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb2d;
+    private TMPro.TextMeshProUGUI playerNameText;
 
     private void Start()
     {
@@ -28,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
         CreateNameText();
 
-        Debug.Log("Nombre de la room " + NetworkManager.instance.GetCurrentRoom());
+        Debug.Log("Room name " + GlobalVariables.roomName);
     }
 
     void Update()
@@ -44,15 +43,13 @@ public class PlayerController : MonoBehaviour
 
             transform.Translate(movement);
 
-            //Debug.Log(transform.position);
-
             animator.SetBool("isRunning", true);
 
             spriteRenderer.flipX = inputX < 0;
 
             if (rb2d.velocity.magnitude < 5)
             {
-                rb2d.velocity = new Vector2(0, 0);
+                rb2d.velocity = new Vector2(0, 0); // not working
             }
         }
         else
@@ -70,7 +67,6 @@ public class PlayerController : MonoBehaviour
         GameObject nameTextGO = new GameObject("text_" + playerName);
         playerNameText = nameTextGO.AddComponent<TMPro.TextMeshProUGUI>();
 
-        //playerNameText = new TMPro.TextMeshProUGUI();
         playerNameText.transform.SetParent(canvas.transform);
 
         playerNameText.text = GlobalVariables.GetPlayerName();
@@ -86,7 +82,7 @@ public class PlayerController : MonoBehaviour
 
     void UpdateNameTextPosition()
     {
-        float Ydelta = .9f;
-        playerNameText.rectTransform.position = gameObject.transform.position + new Vector3(0, Ydelta, 0);
+        float deltaY = .9f;
+        playerNameText.rectTransform.position = gameObject.transform.position + new Vector3(0, deltaY, 0);
     }
 }

@@ -51,7 +51,7 @@ public class NetworkEventManager : MonoBehaviour
         JoinRoomFailed?.Invoke(returnCode, message);
     }
 
-    public void OnPlayerEnteredRoom(Photon.Realtime.Player other)
+    public void OnPlayerEnteredRoom(Player other)
     {
         PlayerEnteredRoom?.Invoke(other);
     }

@@ -2,7 +2,7 @@
 using UnityEngine;
 using WebSocketSharp;
 
-public class GUIProxyNetworkManager : MonoBehaviour
+public class MainMenuManager : MonoBehaviour
 {
 
     [SerializeField]
@@ -25,7 +25,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
         errorText.text = string.Empty;
         playerNameInput.text = GlobalVariables.GetPlayerName();
 
-        NetworkEventManager.instance.ConnectedToMaster += UpdateRegionGUI;
+        NetworkEventManager.instance.ConnectedToMaster += UpdateRegionText;
         NetworkEventManager.instance.JoinedRoom += JoinedRoom;
         NetworkEventManager.instance.JoinRoomFailed += ErrorJoiningRoom;
         NetworkEventManager.instance.CreateRoomFailed += ErrorCreatingRoom;
@@ -34,7 +34,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
 
     public void JoinedRoom(string roomCode)
     {
-        GlobalVariables.roomCode = roomCode;
+        GlobalVariables.roomName = roomCode;
 
         string playerName = playerNameInput.text; // comprobar isNullOrEmpty
         GlobalVariables.SetPlayerName(playerName);
@@ -56,7 +56,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
         errorText.text = message;
     }
 
-    public void UpdateRegionGUI(string regionCode)
+    public void UpdateRegionText(string regionCode)
     {
         regionText.text = "Region: " + RegionCodeToText(regionCode);
     }
@@ -65,7 +65,7 @@ public class GUIProxyNetworkManager : MonoBehaviour
     {
         string code = villajeCodeInput.text.ToUpper();
 
-        if (string.IsNullOrEmpty(code))
+        if (code.IsNullOrEmpty())
         {
             errorText.text = "Village code cannot be empty";
         }
@@ -77,9 +77,9 @@ public class GUIProxyNetworkManager : MonoBehaviour
 
     public void SetPlayerNickname(string nickname)
     {
-        if (string.IsNullOrEmpty(nickname))
+        if (nickname.IsNullOrEmpty())
         {
-            // mostrar error
+            // show error and disable back
         }
         else
         {

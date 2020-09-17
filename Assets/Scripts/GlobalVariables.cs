@@ -1,16 +1,17 @@
 ﻿
 using UnityEditor;
 using UnityEngine;
+using WebSocketSharp;
 
 public class GlobalVariables : MonoBehaviour
 {
 
     static public string MAIN_MENU_SCENE = "Menu";
     static public string WAITING_ROOM_SCENE = "WaitingRoom";
-    static public string VILLAGE_SCCENE = "Village";
+    static public string VILLAGE_SCENE = "Village";
 
 
-    static public string roomCode = "ABC";
+    static public string roomName = "ABC";
     static public string color = "FakeColor";
 
     //static public bool isMasterClient;
@@ -22,7 +23,6 @@ public class GlobalVariables : MonoBehaviour
     public void SetVolumen(float newVolumen)
     {
         volumen = Mathf.Round(newVolumen * 100f) / 100f;
-        Debug.Log(volumen);
     }
 
 
@@ -34,9 +34,9 @@ public class GlobalVariables : MonoBehaviour
 
     static public string GetPlayerName()
     {
-        if (string.IsNullOrEmpty(playerName))
+        if (playerName.IsNullOrEmpty())
         {
-            playerName = "Peasant" + Random.Range(0, 999);
+            playerName = "Peasant_" + Random.Range(0, 999);
         }
         return playerName;
     }

@@ -18,7 +18,7 @@ public class WaitingRoomGUILoader : MonoBehaviour
     {
         playerNameText.text = GlobalVariables.GetPlayerName();
 
-        roomCodeText.text = "Village " + GlobalVariables.roomCode;
+        roomCodeText.text = "Village " + GlobalVariables.roomName;
 
         waitingForPlayersBaseString = waitingForPlayersText.text;
     }
