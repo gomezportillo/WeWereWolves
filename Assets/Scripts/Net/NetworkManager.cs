@@ -2,7 +2,6 @@
 using Photon.Pun;
 using WebSocketSharp;
 using Photon.Realtime;
-using ExitGames.Client.Photon;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -17,14 +16,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     void Awake()
     {
-        if (instance != null && instance != this) {
+        if (instance != null && instance != this)
+        {
             gameObject.SetActive(false);
         }
         else
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-
         }
     }
 
@@ -39,14 +38,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private void OnDestroy()
     {
         PhotonNetwork.Disconnect();
-    }
-
-    public override void OnConnectedToMaster()
-    {
-        base.OnConnectedToMaster();
-
-        string regionCode = PhotonNetwork.CloudRegion;
-        NetworkEventManager.instance.OnConnectedToMaster(regionCode);
     }
 
     public string CreateRoom(string roomName)
@@ -66,9 +57,24 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         };
 
         PhotonNetwork.CreateRoom(roomName, roomOptions);
-        
+
         return roomName;
     }
+
+    public void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
+    }
+
+    #region Pun events
+    public override void OnConnectedToMaster()
+    {
+        base.OnConnectedToMaster();
+
+        string regionCode = PhotonNetwork.CloudRegion;
+        NetworkEventManager.instance.OnConnectedToMaster(regionCode);
+    }
+
 
     public override void OnCreatedRoom()
     {
@@ -124,7 +130,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         NetworkEventManager.instance.OnMasterClientSwitched(newMasterClient);
     }
 
-    // Non-events
+    #endregion
+
+    #region Remote operations
     public void JoinRoom(string roomName)
     {
         if (PhotonNetwork.IsConnected)
@@ -139,8 +147,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void ChangeScene(string sceneName)
     {
-        Logger.instance.LogInfo("Changing scene to: " + sceneName);
-        PhotonNetwork.LoadLevel(sceneName);
+        if (PhotonNetwork.IsMasterClient) { 
+            //PhotonNetwork.CurrentRoom.IsOpen = false;
+            Logger.instance.LogInfo("Changing scene to: " + sceneName);
+            PhotonNetwork.LoadLevel(sceneName);
+        }
     }
 
     public string GetCurrentRoom()
@@ -154,8 +165,21 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.NickName = nickname;
     }
 
-    public void InstantiateNewPlayer(string prefabName)
+    public string GetPlayerNickname()
     {
-        PhotonNetwork.Instantiate(prefabName, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+        return PhotonNetwork.NickName;
     }
+
+    public GameObject InstantiateNewPlayer(string prefabName, Vector3 position)
+    {
+
+        return PhotonNetwork.Instantiate(prefabName, position, Quaternion.identity, 0);
+    }
+
+    public void Destroy(GameObject go)
+    {
+        PhotonNetwork.Destroy(go);
+    }
+
+    #endregion
 }

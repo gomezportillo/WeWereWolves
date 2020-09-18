@@ -20,16 +20,20 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField]
     public TMPro.TextMeshProUGUI regionText;
 
+    private string debugRoomName = "XYZ".ToUpper();
+
     void Start()
     {
         errorText.text = string.Empty;
         playerNameInput.text = GlobalVariables.GetPlayerName();
 
+        // [DEBUG]
+        villajeCodeInput.text = debugRoomName;
+
         NetworkEventManager.instance.ConnectedToMaster += UpdateRegionText;
         NetworkEventManager.instance.JoinedRoom += JoinedRoom;
         NetworkEventManager.instance.JoinRoomFailed += ErrorJoiningRoom;
         NetworkEventManager.instance.CreateRoomFailed += ErrorCreatingRoom;
-
     }
 
     private void OnDestroy()
@@ -47,19 +51,13 @@ public class MainMenuManager : MonoBehaviour
 
     public void ErrorJoiningRoom(short returnCode, string message)
     {
-        if (returnCode == -1)
-        {
-            errorText.text = message;
-        }
-        else
-        {
-            errorText.text = "This village does not exist";
-        }
+        errorText.text = message;
     }
 
     public void CreateRoom()
     {
-        NetworkManager.instance.CreateRoom(null);
+        //NetworkManager.instance.CreateRoom(null);
+        NetworkManager.instance.CreateRoom(debugRoomName);
     }
 
     public void ErrorCreatingRoom(short returnCode, string message)
@@ -90,7 +88,7 @@ public class MainMenuManager : MonoBehaviour
     {
         if (nickname.IsNullOrEmpty())
         {
-            // show error and disable back
+            // show error and disable back button
         }
         else
         {
@@ -101,7 +99,7 @@ public class MainMenuManager : MonoBehaviour
 
     private string RegionCodeToText(string code)
     {
-        switch(code)
+        switch (code)
         {
             case "asia": return "Asia";
             case "au": return "Australia";

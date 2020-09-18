@@ -1,6 +1,8 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -22,8 +24,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private TMPro.TextMeshProUGUI playerNameText;
+    private TMPro.FontStyles masterClientFont = TMPro.FontStyles.Italic;
 
     private bool isFlipped = false;
+
+    private static PlayerController instance;
+
+    void Awake()
+    {
+        instance = this;
+    }
 
     private void Start()
     {
@@ -31,30 +41,34 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 
         CreateNameText();
+        NetworkEventManager.instance.MasterClientSwitched += MasterClientSwitched; // TODO
 
-        if (IsRemotePlayer())
+        if (ThisIsLocalPlayer())
         {
-            return;
+            mainCameraObject = GameObject.FindWithTag(mainCameraTag);
         }
-
-        mainCameraObject = GameObject.FindWithTag(mainCameraTag);
     }
 
+    private void OnDestroy()
+    {
+        DestroyNameText();
+    }
 
     void Update()
     {
-        if (!IsRemotePlayer())
-        { 
+        if (ThisIsLocalPlayer())
+        {
             UpdateMovement();
             UpdateCameraPosition();
         }
+
         UpdateNameTextPosition();
         UpdateFlip();
     }
 
     private void UpdateFlip()
     {
-        // updatable both by UpdateMovement() and photon 
+        // can be flipped both by UpdateMovement() and Photon stream
         spriteRenderer.flipX = isFlipped;
     }
 
@@ -81,9 +95,19 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         }
     }
 
-    private bool IsRemotePlayer()
+    private bool ThisIsRemotePlayer()
     {
         return (photonView.IsMine == false && PhotonNetwork.IsConnected == true);
+    }
+
+    private bool ThisIsLocalPlayer()
+    {
+        return !ThisIsRemotePlayer();
+    }
+
+    private bool ThisIsMasterClient()
+    {
+        return photonView.Owner.IsMasterClient;
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -112,23 +136,43 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     void CreateNameText()
     {
-        string playerName = GlobalVariables.GetPlayerName();
+        string playerName = photonView.Owner.NickName;
 
-        GameObject nameTextGO = new GameObject("text_" + playerName);
+        GameObject nameTextGO = new GameObject("player_" + playerName);
         playerNameText = nameTextGO.AddComponent<TMPro.TextMeshProUGUI>();
 
         Canvas canvas = GameObject.FindWithTag(playerNamesCanvasTag).GetComponent<Canvas>();
         playerNameText.transform.SetParent(canvas.transform);
 
-        playerNameText.text = GlobalVariables.GetPlayerName();
+        playerNameText.text = playerName;
         playerNameText.font = Resources.Load("gothic_pixel SDF", typeof(TMPro.TMP_FontAsset)) as TMPro.TMP_FontAsset;
         playerNameText.rectTransform.localScale = new Vector3(1, 1, 1);
         playerNameText.alignment = TMPro.TextAlignmentOptions.Midline;
         playerNameText.rectTransform.localScale = new Vector2(0.1f, 0.1f);
-
         playerNameText.fontSize = nameFontSize;
 
+        if (ThisIsMasterClient())
+        {
+            playerNameText.GetComponent<TMPro.TextMeshProUGUI>().fontStyle = masterClientFont;
+        }
+
         UpdateNameTextPosition();
+    }
+    private void MasterClientSwitched(Player newMaster)
+    {
+        if (ThisIsMasterClient())
+        {
+            playerNameText.GetComponent<TMPro.TextMeshProUGUI>().fontStyle = masterClientFont;
+        }
+        else
+        {
+            playerNameText.GetComponent<TMPro.TextMeshProUGUI>().fontStyle ^= masterClientFont;
+        }
+    }
+
+    private void DestroyNameText()
+    {
+        Destroy(playerNameText.transform.gameObject);
     }
 
 }

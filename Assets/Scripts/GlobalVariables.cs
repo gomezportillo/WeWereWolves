@@ -6,7 +6,7 @@ using WebSocketSharp;
 public class GlobalVariables : MonoBehaviour
 {
 
-    static public string MAIN_MENU_SCENE = "Menu";
+    static public string MAIN_MENU_SCENE = "MainMenu";
     static public string WAITING_ROOM_SCENE = "WaitingRoom";
     static public string VILLAGE_SCENE = "Village";
 
@@ -26,7 +26,7 @@ public class GlobalVariables : MonoBehaviour
     }
 
 
-    static private string playerName;
+    static private string playerName; // TODO use photonView.Owner.NickName instead
     static public void SetPlayerName(string name)
     {
         playerName = name;

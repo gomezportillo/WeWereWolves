@@ -26,8 +26,6 @@ public class NetworkEventManager : MonoBehaviour
     public event Action<Player> MasterClientSwitched;
     public event Action LeftRoom;
 
-
-
     public void OnConnectedToMaster(string regionCode)
     {
         ConnectedToMaster?.Invoke(regionCode);

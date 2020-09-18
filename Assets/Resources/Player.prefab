@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: 8538505397867865984}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -198,6 +198,7 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   ObservedComponents:
+  - {fileID: 8538505397867865997}
   - {fileID: 8538505397867865987}
   - {fileID: 8538505397867865984}
   viewIdField: 0
