@@ -11,6 +11,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public int randomRoomNameLenght = 4;
     private const string GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+    private string gameVersion = "0.1";
+
     public static NetworkManager instance;
 
     void Awake()
@@ -22,12 +24,21 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+
         }
     }
 
     void Start()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.GameVersion = gameVersion;
+
         PhotonNetwork.ConnectUsingSettings();
+    }
+
+    private void OnDestroy()
+    {
+        PhotonNetwork.Disconnect();
     }
 
     public override void OnConnectedToMaster()
@@ -73,11 +84,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         NetworkEventManager.instance.OnCreateRoomFailed(returnCode, message);
     }
 
-    public void JoinRoom(string roomName)
-    {
-        PhotonNetwork.JoinRoom(roomName);
-    }
-
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
@@ -92,6 +98,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         base.OnJoinRoomFailed(returnCode, message);
         NetworkEventManager.instance.OnJoinRoomFailed(returnCode, message);
+    }
+
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+        NetworkEventManager.instance.OnLeftRoom();
     }
 
     public override void OnPlayerEnteredRoom(Player other)
@@ -113,6 +125,18 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
 
     // Non-events
+    public void JoinRoom(string roomName)
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.JoinRoom(roomName);
+        }
+        else
+        {
+            NetworkEventManager.instance.OnJoinRoomFailed(-1, "Not connected to master server");
+        }
+    }
+
     public void ChangeScene(string sceneName)
     {
         Logger.instance.LogInfo("Changing scene to: " + sceneName);
@@ -128,5 +152,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Logger.instance.LogInfo("New name: " + nickname);
         PhotonNetwork.NickName = nickname;
+    }
+
+    public void InstantiateNewPlayer(string prefabName)
+    {
+        PhotonNetwork.Instantiate(prefabName, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
     }
 }

@@ -32,18 +32,29 @@ public class MainMenuManager : MonoBehaviour
 
     }
 
+    private void OnDestroy()
+    {
+        NetworkEventManager.instance.ConnectedToMaster -= UpdateRegionText;
+        NetworkEventManager.instance.JoinedRoom -= JoinedRoom;
+        NetworkEventManager.instance.JoinRoomFailed -= ErrorJoiningRoom;
+        NetworkEventManager.instance.CreateRoomFailed -= ErrorCreatingRoom;
+    }
+
     public void JoinedRoom(string roomCode)
     {
         GlobalVariables.roomName = roomCode;
-
-        string playerName = playerNameInput.text; // comprobar isNullOrEmpty
-        GlobalVariables.SetPlayerName(playerName);
-        NetworkManager.instance.SetPlayerNickname(playerName);
     }
 
     public void ErrorJoiningRoom(short returnCode, string message)
     {
-        errorText.text = "This village does not exist";
+        if (returnCode == -1)
+        {
+            errorText.text = message;
+        }
+        else
+        {
+            errorText.text = "This village does not exist";
+        }
     }
 
     public void CreateRoom()
@@ -83,6 +94,7 @@ public class MainMenuManager : MonoBehaviour
         }
         else
         {
+            GlobalVariables.SetPlayerName(nickname);
             NetworkManager.instance.SetPlayerNickname(nickname);
         }
     }

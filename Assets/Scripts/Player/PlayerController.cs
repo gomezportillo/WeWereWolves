@@ -1,9 +1,10 @@
 ﻿using Photon.Pun;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.U2D;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPun, IPunObservable
 {
     [SerializeField]
     public int speed = 100;
@@ -12,25 +13,52 @@ public class PlayerController : MonoBehaviour
     public int nameFontSize = 4;
 
     [SerializeField]
-    public Canvas canvas;
+    public string playerNamesCanvasTag = "CanvasPlayerNames";
 
+    [SerializeField]
+    public string mainCameraTag = "MainCamera";
+
+    private GameObject mainCameraObject;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
-    private Rigidbody2D rb2d;
     private TMPro.TextMeshProUGUI playerNameText;
+
+    private bool isFlipped = false;
 
     private void Start()
     {
         animator = gameObject.GetComponent<Animator>();
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        rb2d = GetComponent<Rigidbody2D>();
 
         CreateNameText();
 
-        Debug.Log("Room name " + GlobalVariables.roomName);
+        if (IsRemotePlayer())
+        {
+            return;
+        }
+
+        mainCameraObject = GameObject.FindWithTag(mainCameraTag);
     }
 
+
     void Update()
+    {
+        if (!IsRemotePlayer())
+        { 
+            UpdateMovement();
+            UpdateCameraPosition();
+        }
+        UpdateNameTextPosition();
+        UpdateFlip();
+    }
+
+    private void UpdateFlip()
+    {
+        // updatable both by UpdateMovement() and photon 
+        spriteRenderer.flipX = isFlipped;
+    }
+
+    void UpdateMovement()
     {
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
@@ -45,19 +73,41 @@ public class PlayerController : MonoBehaviour
 
             animator.SetBool("isRunning", true);
 
-            spriteRenderer.flipX = inputX < 0;
-
-            if (rb2d.velocity.magnitude < 5)
-            {
-                rb2d.velocity = new Vector2(0, 0); // not working
-            }
+            isFlipped = inputX < 0;
         }
         else
         {
             animator.SetBool("isRunning", false);
         }
-        
-        UpdateNameTextPosition();
+    }
+
+    private bool IsRemotePlayer()
+    {
+        return (photonView.IsMine == false && PhotonNetwork.IsConnected == true);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(isFlipped);
+        }
+        else
+        {
+            isFlipped = (bool)stream.ReceiveNext();
+        }
+    }
+
+    private void UpdateCameraPosition()
+    {
+        float deltaZ = -10;
+        mainCameraObject.transform.position = this.transform.position + new Vector3(0, 0, deltaZ);
+    }
+
+    void UpdateNameTextPosition()
+    {
+        float deltaY = .9f;
+        playerNameText.rectTransform.position = gameObject.transform.position + new Vector3(0, deltaY, 0);
     }
 
     void CreateNameText()
@@ -67,6 +117,7 @@ public class PlayerController : MonoBehaviour
         GameObject nameTextGO = new GameObject("text_" + playerName);
         playerNameText = nameTextGO.AddComponent<TMPro.TextMeshProUGUI>();
 
+        Canvas canvas = GameObject.FindWithTag(playerNamesCanvasTag).GetComponent<Canvas>();
         playerNameText.transform.SetParent(canvas.transform);
 
         playerNameText.text = GlobalVariables.GetPlayerName();
@@ -80,9 +131,4 @@ public class PlayerController : MonoBehaviour
         UpdateNameTextPosition();
     }
 
-    void UpdateNameTextPosition()
-    {
-        float deltaY = .9f;
-        playerNameText.rectTransform.position = gameObject.transform.position + new Vector3(0, deltaY, 0);
-    }
 }

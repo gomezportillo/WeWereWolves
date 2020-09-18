@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using UnityEngine;
+using Photon.Realtime;
 
 public class Logger : MonoBehaviour
 {
@@ -25,11 +26,12 @@ public class Logger : MonoBehaviour
         NetworkEventManager.instance.PlayerEnteredRoom += this.PlayerEnteredRoom;
         NetworkEventManager.instance.PlayerLeftRoom += this.PlayerLeftRoom;
         NetworkEventManager.instance.MasterClientSwitched += this.MasterClientSwitched;
+        NetworkEventManager.instance.LeftRoom += this.LeftRoom;
     }
 
     void OnDestroy()
     {
-        // Copy 
+        // unsubscribe listeners 
     }
 
     void ConnectedToMaster(string region)
@@ -57,21 +59,25 @@ public class Logger : MonoBehaviour
         LogError("Error joining room: " + message);
     }
 
-    void PlayerEnteredRoom(Photon.Realtime.Player other)
+    void PlayerEnteredRoom(Player other)
     {
         LogInfo("Player entered room: " + other.NickName);
     }
-    void PlayerLeftRoom(Photon.Realtime.Player other)
+    void PlayerLeftRoom(Player other)
     {
         LogInfo("Player left room: " + other.NickName);
     }
-    void MasterClientSwitched(Photon.Realtime.Player newMasterClient)
+    void MasterClientSwitched(Player newMasterClient)
     {
         LogInfo("Master client switched. New one: " + newMasterClient.NickName);
     }
 
+    void LeftRoom()
+    {
+        LogInfo("Room left");
+    }
 
-    // LOG METHODS
+    // Log methods
     public void LogInfo(string message)
     {
         UnityEngine.Debug.Log(MessageHeader() + message);
@@ -80,6 +86,11 @@ public class Logger : MonoBehaviour
     public void LogError(string message)
     {
         UnityEngine.Debug.LogError(MessageHeader() + message);
+    }
+
+    public void LogWarning(string message)
+    {
+        UnityEngine.Debug.LogWarning(MessageHeader() + message);
     }
 
     private string MessageHeader()

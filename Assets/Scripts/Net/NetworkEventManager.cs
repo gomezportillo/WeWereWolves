@@ -21,9 +21,11 @@ public class NetworkEventManager : MonoBehaviour
     public event Action<short, string> CreateRoomFailed;
     public event Action<string> JoinedRoom;
     public event Action<short, string> JoinRoomFailed;
-    public event Action<Photon.Realtime.Player> PlayerEnteredRoom;
-    public event Action<Photon.Realtime.Player> PlayerLeftRoom;
-    public event Action<Photon.Realtime.Player> MasterClientSwitched;
+    public event Action<Player> PlayerEnteredRoom;
+    public event Action<Player> PlayerLeftRoom;
+    public event Action<Player> MasterClientSwitched;
+    public event Action LeftRoom;
+
 
 
     public void OnConnectedToMaster(string regionCode)
@@ -64,5 +66,10 @@ public class NetworkEventManager : MonoBehaviour
     internal void OnMasterClientSwitched(Player newMasterClient)
     {
         MasterClientSwitched?.Invoke(newMasterClient);
+    }
+
+    internal void OnLeftRoom()
+    {
+        LeftRoom?.Invoke();
     }
 }
