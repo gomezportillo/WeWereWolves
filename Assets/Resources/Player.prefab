@@ -174,7 +174,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab09fc48f2809304aacd23883642cb7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 6
+  HumanSpeed: 5
+  WerewolfSpeed: 8
   nameFontSize: 4
   playerNamesCanvasTag: CanvasPlayerNames
   mainCameraTag: MainCamera

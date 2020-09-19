@@ -9,7 +9,12 @@ using UnityEngine.U2D;
 public class PlayerController : MonoBehaviourPun, IPunObservable
 {
     [SerializeField]
-    public int speed = 100;
+    public int HumanSpeed = 5;
+
+    [SerializeField]
+    public int WerewolfSpeed = 8;
+
+    private int Speed;
 
     [SerializeField]
     public int nameFontSize = 4;
@@ -21,13 +26,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public string mainCameraTag = "MainCamera";
 
     private GameObject mainCameraObject;
-    private Animator animator;
-    private SpriteRenderer spriteRenderer;
     private TMPro.TextMeshProUGUI playerNameText;
     private TMPro.FontStyles masterClientFont = TMPro.FontStyles.Italic;
 
     private bool isFlipped = false;
-
+    private bool isHuman = true;
+    private Vector3 initialScale;
     private static PlayerController instance;
 
     void Awake()
@@ -37,10 +41,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void Start()
     {
-        animator = gameObject.GetComponent<Animator>();
-        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-
         CreateNameText();
+        Speed = HumanSpeed;
+        initialScale = gameObject.transform.localScale;
+
         NetworkEventManager.instance.MasterClientSwitched += MasterClientSwitched; // TODO
 
         if (ThisIsLocalPlayer())
@@ -59,6 +63,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (ThisIsLocalPlayer())
         {
             UpdateMovement();
+            UpdateTransformation();
+            UpdateAttack();
             UpdateCameraPosition();
         }
 
@@ -66,10 +72,49 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         UpdateFlip();
     }
 
+    private void UpdateAttack()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && isHuman == false)
+        {
+            gameObject.GetComponent<Animator>().SetTrigger("Attack");
+        }
+    }
+
+    private void UpdateTransformation()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            if (isHuman)
+            {
+                TransformToWerewolf();
+            }
+            else
+            {
+                TransformToHuman();
+            }
+        }
+    }
+
+    private void TransformToWerewolf()
+    {
+        RuntimeAnimatorController WerewolfAnimator = Resources.Load("Animations/Werewolf/Werewolf") as RuntimeAnimatorController;
+        gameObject.GetComponent<Animator>().runtimeAnimatorController = WerewolfAnimator;
+        gameObject.transform.localScale = initialScale * 1.5f;
+        isHuman = false;
+    }
+
+    private void TransformToHuman()
+    {
+        RuntimeAnimatorController HumanAnimator = Resources.Load("Animations/Human/Human") as RuntimeAnimatorController;
+        gameObject.GetComponent<Animator>().runtimeAnimatorController = HumanAnimator;
+        gameObject.transform.localScale = initialScale;
+        isHuman = true;
+    }
+
     private void UpdateFlip()
     {
         // can be flipped both by UpdateMovement() and Photon stream
-        spriteRenderer.flipX = isFlipped;
+        gameObject.GetComponent<SpriteRenderer>().flipX = isFlipped;
     }
 
     void UpdateMovement()
@@ -79,19 +124,19 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
         if (inputX != 0 || inputY != 0)
         {
-            Vector2 movement = new Vector2(speed * inputX, speed * inputY);
+            Vector2 movement = new Vector2(Speed * inputX, Speed * inputY);
 
             movement *= Time.deltaTime;
 
             transform.Translate(movement);
 
-            animator.SetBool("isRunning", true);
+            gameObject.GetComponent<Animator>().SetBool("isRunning", true);
 
             isFlipped = inputX < 0;
         }
         else
         {
-            animator.SetBool("isRunning", false);
+            gameObject.GetComponent<Animator>().SetBool("isRunning", false);
         }
     }
 
