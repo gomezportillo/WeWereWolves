@@ -66,59 +66,51 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (ThisIsLocalPlayer())
         {
             UpdateMovement();
-            GetWantsToEvolve();
-            GetWantsToAttack();
+            CheckWantsToEvolve();
+            CheckWantsToAttack();
             UpdateCameraPosition();
         }
 
-        CheckEvolve();
-        CheckAttack();
         UpdateNameTextPosition();
         UpdateFlip();
     }
 
-    private void CheckEvolve()
-    {
-        if (wantsToEvolve)
-        {
-            if (isHuman)
-            {
-                TransformToWerewolf();
-                ShowPixelExplosion();
-            }
-            else
-            {
-                TransformToHuman();
-                ShowPixelExplosion();
-            }
-            wantsToEvolve = false;
-        }
-    }
-
-
-
-    private void GetWantsToAttack()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && isHuman == false)
-        {
-            wantsToAttack = true;
-        }
-    }
-
-    private void CheckAttack()
-    {
-        if (wantsToAttack)
-        {
-            gameObject.GetComponent<Animator>().SetTrigger("Attack");
-            wantsToAttack = false;
-        }
-    }
-
-    private void GetWantsToEvolve()
+    private void CheckWantsToEvolve()
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            wantsToEvolve = true;
+            photonView.RPC("Evolve", RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    private void Evolve()
+    {
+        if (isHuman)
+        {
+            TransformToWerewolf();
+            ShowPixelExplosion();
+        }
+        else
+        {
+            TransformToHuman();
+            ShowPixelExplosion();
+        }
+    }
+
+    private void CheckWantsToAttack()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && isHuman == false)
+        {
+            photonView.RPC("Attack", RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    private void Attack()
+    {
+        if(!isHuman){
+            gameObject.GetComponent<Animator>().SetTrigger("Attack");
         }
     }
 
@@ -132,7 +124,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     {
         RuntimeAnimatorController WerewolfAnimator = Resources.Load("Animations/Werewolf/Werewolf") as RuntimeAnimatorController;
         gameObject.GetComponent<Animator>().runtimeAnimatorController = WerewolfAnimator;
-        gameObject.transform.localScale = initialScale * 1.5f;
+        gameObject.transform.localScale = initialScale * 1.6f;
         Speed = WerewolfSpeed;
         isHuman = false;
     }
