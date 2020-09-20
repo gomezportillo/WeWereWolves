@@ -31,6 +31,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private bool isFlipped = false;
     private bool isHuman = true;
+    private bool wantsToEvolve = false;
+    private bool wantsToAttack = false;
+
     private Vector3 initialScale;
     private static PlayerController instance;
 
@@ -63,36 +66,66 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (ThisIsLocalPlayer())
         {
             UpdateMovement();
-            UpdateTransformation();
-            UpdateAttack();
+            GetWantsToEvolve();
+            GetWantsToAttack();
             UpdateCameraPosition();
         }
 
+        CheckEvolve();
+        CheckAttack();
         UpdateNameTextPosition();
         UpdateFlip();
     }
 
-    private void UpdateAttack()
+    private void CheckEvolve()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isHuman == false)
-        {
-            gameObject.GetComponent<Animator>().SetTrigger("Attack");
-        }
-    }
-
-    private void UpdateTransformation()
-    {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (wantsToEvolve)
         {
             if (isHuman)
             {
                 TransformToWerewolf();
+                ShowPixelExplosion();
             }
             else
             {
                 TransformToHuman();
+                ShowPixelExplosion();
             }
+            wantsToEvolve = false;
         }
+    }
+
+
+
+    private void GetWantsToAttack()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && isHuman == false)
+        {
+            wantsToAttack = true;
+        }
+    }
+
+    private void CheckAttack()
+    {
+        if (wantsToAttack)
+        {
+            gameObject.GetComponent<Animator>().SetTrigger("Attack");
+            wantsToAttack = false;
+        }
+    }
+
+    private void GetWantsToEvolve()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            wantsToEvolve = true;
+        }
+    }
+
+    private void ShowPixelExplosion()
+    {
+        Animator ExplosionAnimator = transform.Find("Explosion").GetComponent<Animator>();
+        ExplosionAnimator.SetTrigger("Explode");
     }
 
     private void TransformToWerewolf()
@@ -100,6 +133,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         RuntimeAnimatorController WerewolfAnimator = Resources.Load("Animations/Werewolf/Werewolf") as RuntimeAnimatorController;
         gameObject.GetComponent<Animator>().runtimeAnimatorController = WerewolfAnimator;
         gameObject.transform.localScale = initialScale * 1.5f;
+        Speed = WerewolfSpeed;
         isHuman = false;
     }
 
@@ -108,6 +142,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         RuntimeAnimatorController HumanAnimator = Resources.Load("Animations/Human/Human") as RuntimeAnimatorController;
         gameObject.GetComponent<Animator>().runtimeAnimatorController = HumanAnimator;
         gameObject.transform.localScale = initialScale;
+        Speed = HumanSpeed;
         isHuman = true;
     }
 
@@ -160,10 +195,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(isFlipped);
+            stream.SendNext(isHuman);
+            stream.SendNext(wantsToEvolve);
+            stream.SendNext(wantsToAttack);
         }
         else
         {
             isFlipped = (bool)stream.ReceiveNext();
+            isHuman = (bool)stream.ReceiveNext();
+            wantsToEvolve = (bool)stream.ReceiveNext();
+            wantsToAttack = (bool)stream.ReceiveNext();
         }
     }
 
@@ -190,7 +231,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         playerNameText.transform.SetParent(canvas.transform);
 
         playerNameText.text = playerName;
-        playerNameText.font = Resources.Load("gothic_pixel SDF", typeof(TMPro.TMP_FontAsset)) as TMPro.TMP_FontAsset;
+        playerNameText.font = Resources.Load("Fonts/gothic_pixel_SDF", typeof(TMPro.TMP_FontAsset)) as TMPro.TMP_FontAsset;
         playerNameText.rectTransform.localScale = new Vector3(1, 1, 1);
         playerNameText.alignment = TMPro.TextAlignmentOptions.Midline;
         playerNameText.rectTransform.localScale = new Vector2(0.1f, 0.1f);
