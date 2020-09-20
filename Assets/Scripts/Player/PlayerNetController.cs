@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.U2D;
 
-public class PlayerController : MonoBehaviourPun, IPunObservable
+public class PlayerNetController : MonoBehaviourPun, IPunObservable
 {
     [SerializeField]
     public int HumanSpeed = 5;
@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     private bool wantsToAttack = false;
 
     private Vector3 initialScale;
-    private static PlayerController instance;
+    private static PlayerNetController instance;
 
     void Awake()
     {
