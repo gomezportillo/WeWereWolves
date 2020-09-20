@@ -31,8 +31,7 @@ public class PlayerNetController : MonoBehaviourPun, IPunObservable
 
     private bool isFlipped = false;
     private bool isHuman = true;
-    private bool wantsToEvolve = false;
-    private bool wantsToAttack = false;
+    private bool isAttacking = false;
 
     private Vector3 initialScale;
     private static PlayerNetController instance;
@@ -111,7 +110,13 @@ public class PlayerNetController : MonoBehaviourPun, IPunObservable
     {
         if(!isHuman){
             gameObject.GetComponent<Animator>().SetTrigger("Attack");
+            isAttacking = true;
         }
+    }
+
+    void AttackEnded()
+    {
+        isAttacking = false;
     }
 
     private void ShowPixelExplosion()
@@ -148,6 +153,11 @@ public class PlayerNetController : MonoBehaviourPun, IPunObservable
     {
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
+
+        if (!isHuman && isAttacking)
+        {
+            return;
+        }
 
         if (inputX != 0 || inputY != 0)
         {
@@ -188,15 +198,11 @@ public class PlayerNetController : MonoBehaviourPun, IPunObservable
         {
             stream.SendNext(isFlipped);
             stream.SendNext(isHuman);
-            stream.SendNext(wantsToEvolve);
-            stream.SendNext(wantsToAttack);
         }
         else
         {
             isFlipped = (bool)stream.ReceiveNext();
             isHuman = (bool)stream.ReceiveNext();
-            wantsToEvolve = (bool)stream.ReceiveNext();
-            wantsToAttack = (bool)stream.ReceiveNext();
         }
     }
 
