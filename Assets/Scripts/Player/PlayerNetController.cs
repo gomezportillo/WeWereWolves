@@ -9,10 +9,10 @@ using UnityEngine.U2D;
 public class PlayerNetController : MonoBehaviourPun, IPunObservable
 {
     [SerializeField]
-    public int HumanSpeed = 5;
+    public int HumanSpeed = 4;
 
     [SerializeField]
-    public int WerewolfSpeed = 8;
+    public int WerewolfSpeed = 9;
 
     private int Speed;
 
@@ -76,7 +76,7 @@ public class PlayerNetController : MonoBehaviourPun, IPunObservable
 
     private void CheckWantsToEvolve()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(GlobalVariables.EVOLVE_KEY))
         {
             photonView.RPC("Evolve", RpcTarget.All);
         }
@@ -99,7 +99,7 @@ public class PlayerNetController : MonoBehaviourPun, IPunObservable
 
     private void CheckWantsToAttack()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isHuman == false)
+        if (Input.GetKeyDown(GlobalVariables.ATTACK_KEY) && isHuman == false)
         {
             photonView.RPC("Attack", RpcTarget.All);
         }
@@ -114,7 +114,7 @@ public class PlayerNetController : MonoBehaviourPun, IPunObservable
         }
     }
 
-    void AttackEnded()
+    void AttackEnded() // called by the animator
     {
         isAttacking = false;
     }
@@ -153,27 +153,22 @@ public class PlayerNetController : MonoBehaviourPun, IPunObservable
     {
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
+        bool isRunning = inputX != 0 || inputY != 0;
+
+        gameObject.GetComponent<Animator>().SetBool("isRunning", isRunning);
 
         if (!isHuman && isAttacking)
         {
             return;
         }
 
-        if (inputX != 0 || inputY != 0)
+        if (isRunning)
         {
-            Vector2 movement = new Vector2(Speed * inputX, Speed * inputY);
-
-            movement *= Time.deltaTime;
+            Vector2 movement = new Vector2(inputX, inputY) * Speed * Time.deltaTime;
 
             transform.Translate(movement);
 
-            gameObject.GetComponent<Animator>().SetBool("isRunning", true);
-
             isFlipped = inputX < 0;
-        }
-        else
-        {
-            gameObject.GetComponent<Animator>().SetBool("isRunning", false);
         }
     }
 

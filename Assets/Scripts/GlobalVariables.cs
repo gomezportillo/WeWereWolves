@@ -10,6 +10,8 @@ public class GlobalVariables : MonoBehaviour
     static public string WAITING_ROOM_SCENE = "WaitingRoom";
     static public string VILLAGE_SCENE = "Village";
 
+    public const KeyCode EVOLVE_KEY = KeyCode.T;
+    public const KeyCode ATTACK_KEY = KeyCode.Space;
 
     static public string roomName = "ABC";
     static public string color = "FakeColor";
