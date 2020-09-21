@@ -35,6 +35,16 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
     }
 
+    public int GetCurrentNumberOfPlayers()
+    {
+        return PhotonNetwork.CurrentRoom.PlayerCount;
+    }
+
+    public Player[] GetListOfPlayers()
+    {
+        return PhotonNetwork.PlayerList;
+    }
+
     private void OnDestroy()
     {
         PhotonNetwork.Disconnect();
@@ -53,7 +63,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions
         {
             IsVisible = false,
-            MaxPlayers = GlobalVariables.maxNumberPlayers,
+            MaxPlayers = GlobalVariables.MAX_NUMBER_PLAYERS,
         };
 
         PhotonNetwork.CreateRoom(roomName, roomOptions);
@@ -154,7 +164,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public string GetCurrentRoom()
+    public string GetCurrentRoomName()
     {
         return PhotonNetwork.CurrentRoom.Name;
     }
@@ -165,7 +175,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.NickName = nickname;
     }
 
-    public string GetPlayerNickname()
+    public string GetPlayerNickName()
     {
         return PhotonNetwork.NickName;
     }

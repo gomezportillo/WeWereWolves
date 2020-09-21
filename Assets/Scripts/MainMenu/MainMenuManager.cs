@@ -20,18 +20,17 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField]
     public TMPro.TextMeshProUGUI regionText;
 
-    private string debugRoomName = "XYZ".ToUpper();
+    private const string debugRoomName = "XYZ";
 
     void Start()
     {
         errorText.text = string.Empty;
-        playerNameInput.text = GlobalVariables.GetPlayerName();
+        playerNameInput.text = GlobalVariables.GenerateRandomPlayerName();
 
         // [DEBUG]
         villajeCodeInput.text = debugRoomName;
 
         NetworkEventManager.instance.ConnectedToMaster += UpdateRegionText;
-        NetworkEventManager.instance.JoinedRoom += JoinedRoom;
         NetworkEventManager.instance.JoinRoomFailed += ErrorJoiningRoom;
         NetworkEventManager.instance.CreateRoomFailed += ErrorCreatingRoom;
     }
@@ -39,14 +38,8 @@ public class MainMenuManager : MonoBehaviour
     private void OnDestroy()
     {
         NetworkEventManager.instance.ConnectedToMaster -= UpdateRegionText;
-        NetworkEventManager.instance.JoinedRoom -= JoinedRoom;
         NetworkEventManager.instance.JoinRoomFailed -= ErrorJoiningRoom;
         NetworkEventManager.instance.CreateRoomFailed -= ErrorCreatingRoom;
-    }
-
-    public void JoinedRoom(string roomCode)
-    {
-        GlobalVariables.roomName = roomCode;
     }
 
     public void ErrorJoiningRoom(short returnCode, string message)
@@ -92,7 +85,6 @@ public class MainMenuManager : MonoBehaviour
         }
         else
         {
-            GlobalVariables.SetPlayerName(nickname);
             NetworkManager.instance.SetPlayerNickname(nickname);
         }
     }
